@@ -11,9 +11,9 @@
 // Execute `rustlings hint iterators5` or use the `hint` watch subcommand for a
 // hint.
 
-// I AM NOT DONE
 
-use std::collections::HashMap;
+
+use std::{collections::HashMap, os::unix::process};
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum Progress {
@@ -35,7 +35,19 @@ fn count_for(map: &HashMap<String, Progress>, value: Progress) -> usize {
 fn count_iterator(map: &HashMap<String, Progress>, value: Progress) -> usize {
     // map is a hashmap with String keys and Progress values.
     // map = { "variables1": Complete, "from_str": None, ... }
-    todo!();
+    //todo!();
+    let mut answer = [0;3];
+    for (string,process) in map.iter(){
+        match process {
+            Progress::Complete=>{answer[0]+=1;},
+            Progress::None=>{answer[1]+=1;},
+            Progress::Some=>{answer[2]+=1;},
+        }
+    }
+    if value == Progress::Complete{answer[0]}
+    else if value == Progress::None{answer[1]}
+    else if value == Progress::Some{answer[2]}
+    else {0}
 }
 
 fn count_collection_for(collection: &[HashMap<String, Progress>], value: Progress) -> usize {
@@ -54,7 +66,21 @@ fn count_collection_iterator(collection: &[HashMap<String, Progress>], value: Pr
     // collection is a slice of hashmaps.
     // collection = [{ "variables1": Complete, "from_str": None, ... },
     //     { "variables2": Complete, ... }, ... ]
-    todo!();
+    let mut answer = vec![0;3];
+    // 迭代 collection
+    for map in collection.iter() {
+        for (_string, process) in map.iter() {
+            match process {
+                Progress::Complete => { answer[0] += 1; },
+                Progress::None => { answer[1] += 1; },
+                Progress::Some => { answer[2] += 1; },
+            }
+        }
+    }
+    if value == Progress::Complete{answer[0]}
+    else if value == Progress::None{answer[1]}
+    else if value == Progress::Some{answer[2]}
+    else {0}
 }
 
 #[cfg(test)]
