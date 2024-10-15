@@ -7,6 +7,8 @@
 // Execute `rustlings hint from_into` or use the `hint` watch subcommand for a
 // hint.
 
+use std::result;
+
 #[derive(Debug)]
 struct Person {
     name: String,
@@ -40,10 +42,21 @@ impl Default for Person {
 // If while parsing the age, something goes wrong, then return the default of
 // Person Otherwise, then return an instantiated Person object with the results
 
-// I AM NOT DONE
+
 
 impl From<&str> for Person {
     fn from(s: &str) -> Person {
+        let mut parts = s.split(','); // 按逗号分割
+        let name = parts.next().unwrap_or("").to_string(); // 获取名字
+        let age = parts.next().unwrap_or("0").trim().parse::<usize>().unwrap_or(0); // 获取年龄并解析
+        if name.is_empty()||age==0||parts.next()!=None{return Person::default()}
+        Person { name, age } // 返回新的 Person 实例
+    }
+}
+
+impl From<String> for Person {
+    fn from(s: String) -> Person {
+        s.as_str().into() // 调用 &str 的 into 方法
     }
 }
 

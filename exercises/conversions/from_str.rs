@@ -9,7 +9,9 @@
 // Execute `rustlings hint from_str` or use the `hint` watch subcommand for a
 // hint.
 
+use std::io::Empty;
 use std::num::ParseIntError;
+use std::result;
 use std::str::FromStr;
 
 #[derive(Debug, PartialEq)]
@@ -31,7 +33,6 @@ enum ParsePersonError {
     ParseInt(ParseIntError),
 }
 
-// I AM NOT DONE
 
 // Steps:
 // 1. If the length of the provided string is 0, an error should be returned
@@ -52,6 +53,20 @@ enum ParsePersonError {
 impl FromStr for Person {
     type Err = ParsePersonError;
     fn from_str(s: &str) -> Result<Person, Self::Err> {
+        let is_empty: Vec<&str> = s.split(',').collect();
+        if is_empty.len()==0||s.is_empty(){return Err(ParsePersonError::Empty)}
+        let mut parts = s.split(','); // 按逗号分割
+        let name = parts.next().unwrap_or("").to_string(); // 获取名字
+
+        let age_part = parts.next().ok_or(ParsePersonError::BadLen)?;
+        let age_result = age_part.trim().parse::<usize>();
+        let age = match age_result {
+            Ok(age) => age, // 解析成功，获取解析结果
+            Err(e) => return Err(ParsePersonError::ParseInt(e)), // 解析失败，返回自定义错误
+        };
+        if name.is_empty(){return Err(ParsePersonError::NoName)}
+        if is_empty.len()!=2{return Err(ParsePersonError::BadLen)}
+        Ok(Person { name, age }) // 返回新的 Person 实例
     }
 }
 
