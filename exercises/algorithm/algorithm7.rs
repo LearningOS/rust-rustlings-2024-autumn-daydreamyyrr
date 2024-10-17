@@ -3,7 +3,9 @@
 	This question requires you to use a stack to achieve a bracket match
 */
 
-// I AM NOT DONE
+use std::thread::sleep;
+
+
 #[derive(Debug)]
 struct Stack<T> {
 	size: usize,
@@ -32,7 +34,12 @@ impl<T> Stack<T> {
 	}
 	fn pop(&mut self) -> Option<T> {
 		// TODO
-		None
+		if self.size<=0 {return None}
+		self.size-=1;
+		if let Some(value)=self.data.pop(){
+			Some(value)
+		}
+		else {None}
 	}
 	fn peek(&self) -> Option<&T> {
 		if 0 == self.size {
@@ -99,10 +106,39 @@ impl<'a, T> Iterator for IterMut<'a, T> {
 	}
 }
 
+fn is_matching_pair(left: char, right: char) -> bool {
+    match (left, right) {
+        ('(', ')') | ('[', ']') | ('{', '}') => true,
+        _ => false,
+    }
+}
+
 fn bracket_match(bracket: &str) -> bool
 {
 	//TODO
-	true
+	let mut stack = Stack::new();
+    let left_brackets = ['(', '[', '{'];
+    let right_brackets = [')', ']', '}'];
+
+    for ch in bracket.chars() {
+        if left_brackets.contains(&ch) {
+            // 遇到左括号，压入栈中
+            stack.push(ch);
+        } else if right_brackets.contains(&ch) {
+            // 遇到右括号，检查栈顶是否匹配
+            if let Some(top) = stack.pop() {
+                if !is_matching_pair(top, ch) {
+                    return false;
+                }
+            } else {
+                // 栈为空，没有匹配的左括号
+                return false;
+            }
+        }
+    }
+
+    // 最后检查栈是否为空
+    stack.is_empty()
 }
 
 #[cfg(test)]

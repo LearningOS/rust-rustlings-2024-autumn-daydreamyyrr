@@ -2,11 +2,13 @@
 	single linked list merge
 	This problem requires you to merge two ordered singly linked lists into one ordered singly linked list
 */
-// I AM NOT DONE
+
 
 use std::fmt::{self, Display, Formatter};
 use std::ptr::NonNull;
-use std::vec::*;
+use std::{clone, vec::*};
+use std::cmp::Ordering;
+
 
 #[derive(Debug)]
 struct Node<T> {
@@ -29,13 +31,13 @@ struct LinkedList<T> {
     end: Option<NonNull<Node<T>>>,
 }
 
-impl<T> Default for LinkedList<T> {
+impl<T:Clone> Default for LinkedList<T> {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<T> LinkedList<T> {
+impl<T:Clone> LinkedList<T> {
     pub fn new() -> Self {
         Self {
             length: 0,
@@ -70,14 +72,47 @@ impl<T> LinkedList<T> {
         }
     }
 	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
-	{
-		//TODO
-		Self {
-            length: 0,
-            start: None,
-            end: None,
+    where
+    T: PartialOrd,
+{
+    let mut result = Self::new();
+    let mut current_a = list_a.start;
+    let mut current_b = list_b.start;
+
+    // 比较并合并两个链表
+    while current_a.is_some() && current_b.is_some() {
+        let node_a = unsafe { current_a.unwrap().as_ref() };
+        let node_b = unsafe { current_b.unwrap().as_ref() };
+        match node_a.val.partial_cmp(&node_b.val) {
+            Some(Ordering::Less) | Some(Ordering::Equal) => {
+                // 如果 list_a 的节点值较小或相等，添加 list_a 的节点
+                result.add(node_a.val.clone());
+                current_a = node_a.next;
+            }
+            Some(Ordering::Greater) => {
+                // 如果 list_b 的节点值较小，添加 list_b 的节点
+                result.add(node_b.val.clone());
+                current_b = node_b.next;
+            }
+            _ => unreachable!(),
         }
-	}
+    }
+
+    // 处理剩余的节点
+    while let Some(node_a) = current_a {
+        let node = unsafe { node_a.as_ref() };
+        result.add(node.val.clone());
+        current_a = node.next;
+    }
+
+    while let Some(node_b) = current_b {
+        let node = unsafe { node_b.as_ref() };
+        result.add(node.val.clone());
+        current_b = node.next;
+    }
+
+    result
+    }
 }
 
 impl<T> Display for LinkedList<T>
